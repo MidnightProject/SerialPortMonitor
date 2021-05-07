@@ -1,12 +1,52 @@
 ﻿<Window x:Class="SerialPortMonitor.MainWindow"
+        xmlns:tb="http://www.hardcodet.net/taskbar" 
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SerialPortMonitor"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        xmlns:c="clr-namespace:SerialPortMonitor.Converter"
+        mc:Ignorable="d">
+
+    <Window.Resources>
+        <c:ListToVisibilityConverter  x:Key="listToVisibilityConverter" />
+    </Window.Resources>
+
+    <tb:TaskbarIcon x:Name="notifyIcon"
+                    ToolTipText="Serial Port Monitor"
+                    PopupActivation="DoubleClick">
+
+        <tb:TaskbarIcon.TrayPopup>
+            <Grid Width="auto" Height="auto" Visibility="{Binding Ports, Converter={StaticResource listToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                <ListView Margin="15" ItemsSource="{Binding Ports}" FontSize="14">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <WrapPanel>
+                                <Image MaxHeight="20" Margin="0,0,2,0">
+                                    <Image.Style>
+                                        <Style TargetType="{x:Type Image}">
+                                            <Setter Property="Source" Value="\Images\button_blue_play.png"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True" Binding="{Binding Open}">
+                                                    <Setter Property="Source" Value="\Images\block_black.png"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                                <TextBlock Text="Name: " />
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                <TextBlock Text=", " />
+                                <TextBlock Text="Description: " />
+                                <TextBlock Text="{Binding Description}" FontWeight="Bold" />
+                            </WrapPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </tb:TaskbarIcon.TrayPopup>
+
         
-    </Grid>
+
+    </tb:TaskbarIcon>
 </Window>

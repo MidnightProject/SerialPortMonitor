@@ -1,28 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Drawing;
+using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using SerialPortMonitor.Model;
 
 namespace SerialPortMonitor
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public ObservableCollection<Port> Ports { get; set; }
+
+        private void UpdatePortsList()
+        {
+            OnPropertyChanged("Ports");
+        }  
+
         public MainWindow()
         {
+            Ports = new ObservableCollection<Port>();
+            UpdatePortsList();
+
+            this.DataContext = this;
             InitializeComponent();
+
+            this.Hide();
+            notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("/Images/monitor.ico", UriKind.Relative)).Stream);
+
+            Ports.Add("COM1");
+            UpdatePortsList();
+
+            Ports.UpdateOpen("COM1", true);
+
+            //Ports.Remove("COM1");
+            //UpdatePortsList();
+
+
+
+
         }
     }
 }
