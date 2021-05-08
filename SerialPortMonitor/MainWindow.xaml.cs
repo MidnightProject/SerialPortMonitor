@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using SerialPortMonitor.Model;
 
+
 namespace SerialPortMonitor
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
@@ -21,11 +22,34 @@ namespace SerialPortMonitor
         private void UpdatePortsList()
         {
             OnPropertyChanged("Ports");
-        }  
+        }
+
+        private DeviceNotifier notifier = new DeviceNotifier();
+        private void InitializeNotifications()
+        {
+            notifier.StartInsertUSBHandler();
+            notifier._NotifyUsbAdded += Notifier__NotifyUsbAdded;
+
+            notifier.StartRemoveUSBHandler();
+            notifier._NotifyUsbRemoved += Notifier__NotifyUsbRemoved;
+        }
+
+        private void Notifier__NotifyUsbRemoved(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Notifier__NotifyUsbAdded(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
 
         public MainWindow()
         {
             Ports = new ObservableCollection<Port>();
+
+            InitializeNotifications();
+
             UpdatePortsList();
 
             this.DataContext = this;
@@ -47,4 +71,6 @@ namespace SerialPortMonitor
 
         }
     }
+
+
 }
