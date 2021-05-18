@@ -8,6 +8,7 @@ using System.Management;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Threading;
+using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 using SerialPortMonitor.Model;
 
@@ -65,10 +66,44 @@ namespace SerialPortMonitor
             AddPorts(GetSystemSerialPorts());
         }
 
+        private List<BalloonTip> balloonTips;
+
+        private DispatcherTimer timerBalloonTips;
+        private void timerBalloonTips_Tick(object sender, EventArgs e)
+        {
+            timerBalloonTips.Stop();
+
+            switch (balloonTips.Count)
+            {
+                case 0:
+                    return;
+                case 1:
+                    balloonTips.RemoveAt(0);
+                    return;
+                default:
+                    balloonTips.RemoveAt(0);
+                    notifyIcon.ShowBalloonTip(balloonTips[0].Title(), balloonTips[0].Message(), BalloonIcon.Info);
+                    timerBalloonTips.Start();
+                    return;
+            }
+        }
+
+        private void ShowBallonTips(BalloonTip balloonTip)
+        {
+            balloonTips.Add(balloonTip);
+
+            if (balloonTips.Count ==  1)
+            {
+                notifyIcon.ShowBalloonTip(balloonTips[0].Title(), balloonTips[0].Message(), BalloonIcon.Info);
+                timerBalloonTips.Start();
+            }
+        }
+
 
         public MainWindow()
         {
             Ports = new ObservableCollection<Port>();
+            balloonTips = new List<BalloonTip>();
 
             InitializeNotifications();
 
@@ -80,15 +115,6 @@ namespace SerialPortMonitor
             this.Hide();
             notifyIcon.Icon = new Icon(Application.GetResourceStream(new Uri("/Images/monitor.ico", UriKind.Relative)).Stream);
 
-            //Ports.Add("COM1");
-
-            //Ports.UpdateOpen("COM1", true);
-
-            //Ports.Remove("COM1");
-
-            UpdatePorts();
-
-
             timerUsbRemoved = new DispatcherTimer();
             timerUsbRemoved.Tick += timerUsbRemoved_Tick;
             timerUsbRemoved.Interval = TimeSpan.FromSeconds(5);
@@ -96,6 +122,12 @@ namespace SerialPortMonitor
             timerUsbAdded = new DispatcherTimer();
             timerUsbAdded.Tick += timerUsbAdded_Tick;
             timerUsbAdded.Interval = TimeSpan.FromSeconds(5);
+
+            timerBalloonTips = new DispatcherTimer();
+            timerBalloonTips.Tick += timerBalloonTips_Tick;
+            timerBalloonTips.Interval = TimeSpan.FromSeconds(5);
+
+            UpdatePorts();
         }
 
         
@@ -139,20 +171,12 @@ namespace SerialPortMonitor
         {
             if (systemSerialPorts != null && Ports != null)
             {
-                foreach (Port portToRemove in Ports)
-                {
-                    var name = systemSerialPorts.FirstOrDefault(port => port.Name == portToRemove.Name);
-                    if (name == null)
-                    {
-                        //Ports.RemovePort(portToRemove.Name);
-                    }
-                }
-
                 for (int i = 0; i < Ports.Count; i++)
                 {
                     var name = systemSerialPorts.FirstOrDefault(port => port.Name == Ports[i].Name);
                     if (name == null)
                     {
+                        ShowBallonTips(new BalloonTip() { Name = Ports[i].Name, Description = Ports[i].Description, PortStatus = Status.Removed });
                         Ports.Remove(Ports[i].Name);
                     }
                 }
@@ -170,6 +194,7 @@ namespace SerialPortMonitor
                     var name = Ports.FirstOrDefault(port => port.Name == portToAdd.Name);
                     if (name == null)
                     {
+                        ShowBallonTips(new BalloonTip() { Name = portToAdd.Name, Description = portToAdd.Description, PortStatus = Status.Added });
                         Ports.Add(portToAdd.Name, portToAdd.Description);
                     }
                 }
