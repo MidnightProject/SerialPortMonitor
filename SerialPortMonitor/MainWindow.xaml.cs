@@ -147,19 +147,18 @@ namespace SerialPortMonitor
                         && property.GetPropertyValue("Name").ToString().Contains(name))
                     {
                         string description = property.GetPropertyValue("Description").ToString();
+                        string device = String.Empty;
 
-                        systemSerialPorts.Add(new Port() { Name = name, Description = description });
-
-                        /*
                         RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Hardware\DeviceMap\SerialComm");
                         foreach (string value in key.GetValueNames())
                         {
                             if (key.GetValue(value).ToString() == name)
                             {
-                                var v = value;
+                                device = value.ToString();
                             }
                         }
-                        */
+
+                        systemSerialPorts.Add(new Port() { Name = name, Description = description, Device = device });
                     }
                 }
             }
@@ -195,7 +194,7 @@ namespace SerialPortMonitor
                     if (name == null)
                     {
                         ShowBallonTips(new BalloonTip() { Name = portToAdd.Name, Description = portToAdd.Description, PortStatus = Status.Added });
-                        Ports.Add(portToAdd.Name, portToAdd.Description);
+                        Ports.Add(portToAdd.Name, portToAdd.Description, portToAdd.Device);
                     }
                 }
             }

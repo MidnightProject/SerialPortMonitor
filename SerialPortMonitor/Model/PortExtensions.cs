@@ -12,15 +12,15 @@ namespace SerialPortMonitor.Model
             return list;
         }
 
-        public static ObservableCollection<Port> Add(this ObservableCollection<Port> list, string name, string description)
+        public static ObservableCollection<Port> Add(this ObservableCollection<Port> list, string name, string description, string device)
         {
-            list.Add(new Port() { Name = name, Description = description });
+            list.Add(new Port() { Name = name, Description = description, Device = device});
             return list;
         }
 
-        public static ObservableCollection<Port> Add(this ObservableCollection<Port> list, string name, string description, Boolean open)
+        public static ObservableCollection<Port> Add(this ObservableCollection<Port> list, string name, string description, string device, Boolean open)
         {
-            list.Add(new Port() { Name = name, Description = description, Open = open });
+            list.Add(new Port() { Name = name, Description = description, Device = device, Open = open });
             return list;
         }
 
