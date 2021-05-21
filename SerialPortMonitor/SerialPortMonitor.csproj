@@ -70,6 +70,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Converter\ListToVisibilityConverter.cs" />
+    <Compile Include="Converter\OpenToToolTipConverter.cs" />
     <Compile Include="Helpers\DeviceNotifier.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

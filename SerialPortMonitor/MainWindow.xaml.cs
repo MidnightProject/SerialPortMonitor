@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Management;
@@ -66,6 +68,12 @@ namespace SerialPortMonitor
             AddPorts(GetSystemSerialPorts());
         }
 
+        private DispatcherTimer timerUpdateOpen;
+        private void timerUpdateOpen_Tick(object sender, EventArgs e)
+        {
+            UpdateOpen();
+        }
+
         private List<BalloonTip> balloonTips;
 
         private DispatcherTimer timerBalloonTips;
@@ -127,10 +135,13 @@ namespace SerialPortMonitor
             timerBalloonTips.Tick += timerBalloonTips_Tick;
             timerBalloonTips.Interval = TimeSpan.FromSeconds(5);
 
+            timerUpdateOpen = new DispatcherTimer();
+            timerUpdateOpen.Tick += timerUpdateOpen_Tick;
+            timerUpdateOpen.Interval = TimeSpan.FromSeconds(5);
+
             UpdatePorts();
         }
 
-        
 
         private List<Port> GetSystemSerialPorts()
         {
@@ -206,6 +217,54 @@ namespace SerialPortMonitor
         {
             Ports.Clear();
             AddPorts(GetSystemSerialPorts());
+            UpdateOpen();
+        }
+
+        private void UpdateOpen()
+        {
+            var proc = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = @"C:\Windows\System32\mode.com",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            proc.Start();
+            proc.WaitForExit(4000);
+
+            var output = proc.StandardOutput.ReadToEnd();
+
+            foreach (Port port in Ports)
+            {
+                if (output.Contains(port.Name + ':'))
+                {
+                    port.Open = false;
+                }
+                else
+                {
+                    port.Open = true;
+                }
+            }
+
+        }
+
+        
+
+        private void TrayPopup_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            UpdateOpen();
+            timerUpdateOpen.Start();
+
+            
+        }
+
+        private void TrayPopup_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            timerUpdateOpen.Stop();
         }
     }
 }
