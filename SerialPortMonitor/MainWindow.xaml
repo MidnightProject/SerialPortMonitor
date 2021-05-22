@@ -11,6 +11,47 @@
     <Window.Resources>
         <c:ListToVisibilityConverter  x:Key="listToVisibilityConverter" />
         <c:OpenToToolTipConverter x:Key="openToToolTipConverter" />
+
+        <DataTemplate x:Key="trayPopupTemplate">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <WrapPanel Grid.Row="0">
+                    <Image MaxHeight="20" Margin="0,0,2,0" ToolTip="{Binding Open, Converter={StaticResource openToToolTipConverter}}">
+                        <Image.Style>
+                            <Style TargetType="{x:Type Image}">
+                                <Setter Property="Source" Value="\Images\block_black.png"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True" Binding="{Binding Open}">
+                                        <Setter Property="Source" Value="\Images\button_blue_play.png"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                    <TextBlock Text="Name: " />
+                    <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                    <TextBlock Text=", " />
+                    <TextBlock Text="Description: " />
+                    <TextBlock Text="{Binding Description}" FontWeight="Bold" />
+                </WrapPanel>
+
+                <Grid Grid.Row="1" MinHeight="20">
+                    <Grid.Style>
+                        <Style>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="False">
+                                    <Setter Property="Grid.Visibility" Value="Collapsed"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                </Grid>
+            </Grid>
+        </DataTemplate>
     </Window.Resources>
 
     <tb:TaskbarIcon x:Name="notifyIcon"
@@ -19,30 +60,7 @@
 
         <tb:TaskbarIcon.TrayPopup>
             <Grid Width="auto" Height="auto" Visibility="{Binding Ports, Converter={StaticResource listToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
-                <ListView Margin="15" ItemsSource="{Binding Ports}" FontSize="14" MouseEnter="TrayPopup_MouseEnter" MouseLeave="TrayPopup_MouseLeave">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <WrapPanel>
-                                <Image MaxHeight="20" Margin="0,0,2,0" ToolTip="{Binding Open, Converter={StaticResource openToToolTipConverter}}">
-                                    <Image.Style>
-                                        <Style TargetType="{x:Type Image}">
-                                            <Setter Property="Source" Value="\Images\block_black.png"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Value="True" Binding="{Binding Open}">
-                                                        <Setter Property="Source" Value="\Images\button_blue_play.png"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
-                                <TextBlock Text="Name: " />
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                                <TextBlock Text=", " />
-                                <TextBlock Text="Description: " />
-                                <TextBlock Text="{Binding Description}" FontWeight="Bold" />
-                            </WrapPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
+                <ListView Margin="15" ItemsSource="{Binding Ports}" SelectionMode="Single" FontSize="14" MouseEnter="TrayPopup_MouseEnter" MouseLeave="TrayPopup_MouseLeave" ItemTemplate="{StaticResource trayPopupTemplate}">
                 </ListView>
             </Grid>
         </tb:TaskbarIcon.TrayPopup>
