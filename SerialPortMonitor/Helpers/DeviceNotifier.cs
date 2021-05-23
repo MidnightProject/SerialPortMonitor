@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Management;
 
+/* ---------------------------------------------------------------------------------------------------------- */
+/* Author: Ramankingdom */
+/* Link: https://stackoverflow.com/questions/45276832/how-to-update-serialport-when-device-plug-in-out-in-wpf */
+/* ---------------------------------------------------------------------------------------------------------- */
+
+
 public partial class DeviceNotifier : IDisposable
 {
     private ManagementEventWatcher w = null;
