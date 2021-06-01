@@ -15,6 +15,7 @@
         <c:ApplicationToVisibilityConverter x:Key="applicationToProgressBarVisibilityConverter"  />
         <c:ApplicationToVisibilityConverter x:Key="applicationToDetailsApplicationVisibilityConverter" FalseValue="Visible" TrueValue="Collapsed" />
         <p:ActualSizePropertyProxy x:Key="actualSizePropertyProxy" Element="{Binding Source= {x:Reference trayPopupGrid}}" />
+        <p:BindingProxy x:Key="bindingProxy" Data="{Binding}" />
 
         <DataTemplate x:Key="trayPopupTemplate">
             <Grid>
@@ -66,13 +67,23 @@
                         <ProgressBar Grid.Row="0" Minimum="0" Maximum="100" Foreground="LightBlue" IsIndeterminate="True" Height="20" Visibility="{Binding ApplicationName, Converter={StaticResource applicationToProgressBarVisibilityConverter}}"/>
                     </Grid>
 
-                    <Grid Grid.Row="1" Visibility="{Binding ApplicationName, Converter={StaticResource applicationToDetailsApplicationVisibilityConverter} }">
+                    <Grid Grid.Row="1" Visibility="{Binding ApplicationName, Converter={StaticResource applicationToDetailsApplicationVisibilityConverter}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="40"/>
                             <ColumnDefinition Width="*" MaxWidth="300"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
+                        <Grid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Refresh" Command="{Binding Data.RefreshCommand, Source={StaticResource bindingProxy}}">
+                                    <MenuItem.Icon>
+                                        <Image Source="\Images\sub_blue_rotate_cw.png" Margin="0,0,2,2"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </Grid.ContextMenu>
+                        
                         <Image Grid.Column="0" MaxHeight="20" Margin="20,0,0,0" HorizontalAlignment="Left">
                             <Image.Style>
                                 <Style TargetType="{x:Type Image}">

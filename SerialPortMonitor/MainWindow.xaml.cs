@@ -20,6 +20,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Input;
+using static SerialPortMonitor.Helpers.Command;
 
 namespace SerialPortMonitor
 {
@@ -386,5 +388,34 @@ namespace SerialPortMonitor
                 Ports[SelectedIndexFromPortsList].ApplicationPath = String.Empty;
             } 
         }
-    } 
+
+        #region RefreshCommand
+        private ICommand refreshCommand;
+        public ICommand RefreshCommand
+        {
+            get
+            {
+                if (refreshCommand == null)
+                {
+                    refreshCommand = new RelayCommand(
+                        param => this.RefreshAsync(),
+                        param => this.CanRefresh()
+                    );
+                }
+                return refreshCommand;
+            }
+        }
+
+        private bool CanRefresh()
+        {
+            return true;
+        }
+
+        private async Task RefreshAsync()
+        {
+            Ports[SelectedIndexFromPortsList].ApplicationName = String.Empty;
+            await UpdateApplicationAsync();
+        }
+        #endregion
+    }
 }
