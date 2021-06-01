@@ -331,7 +331,7 @@ namespace SerialPortMonitor
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = Path.Combine(Environment.CurrentDirectory, @"\handle.exe"),
+                    FileName = Path.Combine(Environment.CurrentDirectory, @"Helpers\", "handle.exe"),
                     Arguments = "-a " + Ports[SelectedIndexFromPortsList].Device,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,

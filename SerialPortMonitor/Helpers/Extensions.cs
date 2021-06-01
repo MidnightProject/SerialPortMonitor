@@ -32,7 +32,10 @@ namespace SerialPortMonitor.Helpers
 
         public static Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (process.HasExited) return Task.CompletedTask;
+            if (process.HasExited)
+            {
+                return Task.CompletedTask;
+            }
 
             var tcs = new TaskCompletionSource<object>();
             process.EnableRaisingEvents = true;
