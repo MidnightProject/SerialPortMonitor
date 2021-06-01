@@ -5,15 +5,21 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Threading;
 using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 using SerialPortMonitor.Model;
-
+using SerialPortMonitor.Helpers;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace SerialPortMonitor
 {
@@ -71,7 +77,14 @@ namespace SerialPortMonitor
         private DispatcherTimer timerUpdateOpen;
         private void timerUpdateOpen_Tick(object sender, EventArgs e)
         {
-            UpdateOpen();
+            UpdateOpenAsync();
+        }
+
+        private DispatcherTimer timerUpdateApplication;
+        private void timerUpdateApplication_Tick(object sender, EventArgs e)
+        {
+            timerUpdateApplication.Stop();
+            UpdateApplicationAsync();
         }
 
         private List<BalloonTip> balloonTips;
@@ -100,7 +113,7 @@ namespace SerialPortMonitor
         {
             balloonTips.Add(balloonTip);
 
-            if (balloonTips.Count ==  1)
+            if (balloonTips.Count == 1)
             {
                 notifyIcon.ShowBalloonTip(balloonTips[0].Title(), balloonTips[0].Message(), BalloonIcon.Info);
                 timerBalloonTips.Start();
@@ -216,11 +229,14 @@ namespace SerialPortMonitor
         private void UpdatePorts()
         {
             Ports.Clear();
+
             AddPorts(GetSystemSerialPorts());
-            UpdateOpen();
+            SelectedIndexFromPortsList = -1;
+
+            UpdateOpenAsync();
         }
 
-        private void UpdateOpen()
+        private async Task UpdateOpenAsync()
         {
             var proc = new Process
             {
@@ -234,7 +250,7 @@ namespace SerialPortMonitor
             };
 
             proc.Start();
-            proc.WaitForExit(4000);
+            await proc.WaitForExitAsync();
 
             var output = proc.StandardOutput.ReadToEnd();
 
@@ -242,6 +258,12 @@ namespace SerialPortMonitor
             {
                 if (output.Contains(port.Name + ':'))
                 {
+                    int index = Ports.IndexOf(Ports.Where(n => n.Name == port.Name).FirstOrDefault());
+                    if (index != -1 && index == SelectedIndexFromPortsList)
+                    {
+                        SelectedIndexFromPortsList = -1;
+                    }
+
                     port.Open = false;
                 }
                 else
@@ -249,22 +271,120 @@ namespace SerialPortMonitor
                     port.Open = true;
                 }
             }
-
         }
-
-        
 
         private void TrayPopup_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            UpdateOpen();
+            UpdateOpenAsync();
             timerUpdateOpen.Start();
-
-            
         }
 
         private void TrayPopup_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
             timerUpdateOpen.Stop();
         }
-    }
+
+        private int OldSelectedIndexFromPortsList;
+        private int selectedIndexFromPortsList;
+        public int SelectedIndexFromPortsList
+        {
+            get
+            {
+                return selectedIndexFromPortsList;
+            }
+
+            set
+            {
+                selectedIndexFromPortsList = value;
+                OnPropertyChanged("SelectedIndexFromPortsList");
+            }
+        }
+
+        private void TrayPopup_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            SelectedIndexFromPortsList = -1;
+        }
+
+        private void ListView_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (SelectedIndexFromPortsList != -1)
+            {
+                if (OldSelectedIndexFromPortsList == SelectedIndexFromPortsList)
+                {
+                    SelectedIndexFromPortsList = -1;
+                }
+                else
+                {
+                    if ( String.IsNullOrEmpty(Ports[SelectedIndexFromPortsList].ApplicationName) )
+                    {
+                        UpdateApplicationAsync();
+                    }
+                }
+
+                OldSelectedIndexFromPortsList = SelectedIndexFromPortsList;
+            }
+        }
+
+        private async Task UpdateApplicationAsync()
+        {
+            var proc = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = Path.Combine(Environment.CurrentDirectory, @"\handle.exe"),
+                    Arguments = "-a " + Ports[SelectedIndexFromPortsList].Device,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            proc.Start();
+            await proc.WaitForExitAsync();
+
+            var output = proc.StandardOutput.ReadToEnd();
+
+            string patternName = @".+(?=pid:)";
+            Regex rgName = new Regex(patternName);
+            MatchCollection matchedName = rgName.Matches(output.Replace(" ", ""));
+
+            if (matchedName.Count != 0)
+            {
+                Ports[SelectedIndexFromPortsList].ApplicationName = matchedName[0].Value;
+
+                string patternPID = @"(?<=pid: )(\d+)";
+                Regex rgPID = new Regex(patternPID);
+                MatchCollection matchedPID = rgPID.Matches(output);
+
+                if (matchedPID.Count != 0)
+                {
+                    Ports[SelectedIndexFromPortsList].PID = matchedPID[0].Value;
+
+                    proc = Process.GetProcessById( int.Parse(matchedPID[0].Value));
+                    string path = proc.GetPathToApp();
+
+                    Ports[SelectedIndexFromPortsList].ApplicationPath = path;
+
+                    Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(path);
+                    using (Bitmap bmp = icon.ToBitmap())
+                    {
+                        var stream = new MemoryStream();
+                        bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                        Ports[SelectedIndexFromPortsList].ApplicationIcon = BitmapFrame.Create(stream);
+                    }
+                }
+                else
+                {
+                    Ports[SelectedIndexFromPortsList].PID = String.Empty;
+                    Ports[SelectedIndexFromPortsList].ApplicationPath = String.Empty;
+                }
+            }
+            else
+            {
+                Ports[SelectedIndexFromPortsList].ApplicationName = "File Not Found";
+                Ports[SelectedIndexFromPortsList].PID = String.Empty;
+                Ports[SelectedIndexFromPortsList].ApplicationPath = String.Empty;
+            } 
+        }
+    } 
 }

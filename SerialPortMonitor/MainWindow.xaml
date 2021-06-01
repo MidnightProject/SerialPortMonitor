@@ -6,18 +6,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SerialPortMonitor"
         xmlns:c="clr-namespace:SerialPortMonitor.Converter"
+        xmlns:p="clr-namespace:SerialPortMonitor.Proxy"
         mc:Ignorable="d">
 
     <Window.Resources>
-        <c:ListToVisibilityConverter  x:Key="listToVisibilityConverter" />
+        <c:ListToVisibilityConverter x:Key="listToVisibilityConverter" />
         <c:OpenToToolTipConverter x:Key="openToToolTipConverter" />
+        <c:ApplicationToVisibilityConverter x:Key="applicationToProgressBarVisibilityConverter"  />
+        <c:ApplicationToVisibilityConverter x:Key="applicationToDetailsApplicationVisibilityConverter" FalseValue="Visible" TrueValue="Collapsed" />
+        <p:ActualSizePropertyProxy x:Key="actualSizePropertyProxy" Element="{Binding Source= {x:Reference trayPopupGrid}}" />
 
         <DataTemplate x:Key="trayPopupTemplate">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition />
+                    <RowDefinition/>
                     <RowDefinition />
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
 
                 <WrapPanel Grid.Row="0">
                     <Image MaxHeight="20" Margin="0,0,2,0" ToolTip="{Binding Open, Converter={StaticResource openToToolTipConverter}}">
@@ -39,7 +46,7 @@
                     <TextBlock Text="{Binding Description}" FontWeight="Bold" />
                 </WrapPanel>
 
-                <Grid Grid.Row="1" MinHeight="20">
+                <Grid Grid.Row="1" MinHeight="20" Margin="0,5,5,5" MinWidth="{Binding ActualWidthValue, Source={StaticResource actualSizePropertyProxy}}" HorizontalAlignment="Left" MouseLeftButtonDown="TrayPopup_MouseLeftButtonDown">
                     <Grid.Style>
                         <Style>
                             <Style.Triggers>
@@ -49,6 +56,43 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <ProgressBar Grid.Row="0" Minimum="0" Maximum="100" Foreground="LightBlue" IsIndeterminate="True" Height="20" Visibility="{Binding ApplicationName, Converter={StaticResource applicationToProgressBarVisibilityConverter}}"/>
+                    </Grid>
+
+                    <Grid Grid.Row="1" Visibility="{Binding ApplicationName, Converter={StaticResource applicationToDetailsApplicationVisibilityConverter} }">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="*" MaxWidth="300"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Image Grid.Column="0" MaxHeight="20" Margin="20,0,0,0" HorizontalAlignment="Left">
+                            <Image.Style>
+                                <Style TargetType="{x:Type Image}">
+                                    <Setter Property="Source" Value="{Binding ApplicationIcon}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Value="File Not Found" Binding="{Binding ApplicationName}">
+                                            <Setter Property="Source" Value="\Images\block_black.png"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                        <TextBlock Grid.Column="1" Margin="5,0,0,0" Text="{Binding ApplicationName}" TextWrapping="Wrap" ToolTip="{Binding ApplicationPath}"/>
+                        <WrapPanel Grid.Column="2" Margin="5,0,0,0" HorizontalAlignment="Right">
+                            <TextBlock Text= "PID: " />
+                            <TextBlock Text="{Binding PID}" FontWeight="Bold" />
+                        </WrapPanel>
+                        
+                    </Grid>
+                    
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -59,8 +103,13 @@
                     PopupActivation="DoubleClick">
 
         <tb:TaskbarIcon.TrayPopup>
-            <Grid Width="auto" Height="auto" Visibility="{Binding Ports, Converter={StaticResource listToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
-                <ListView Margin="15" ItemsSource="{Binding Ports}" SelectionMode="Single" FontSize="14" MouseEnter="TrayPopup_MouseEnter" MouseLeave="TrayPopup_MouseLeave" ItemTemplate="{StaticResource trayPopupTemplate}">
+            <Grid x:Name="trayPopupGrid" Height="Auto" Visibility="{Binding Ports, Converter={StaticResource listToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                <ListView Margin="15" ItemsSource="{Binding Ports}" SelectionMode="Single" SelectedIndex="{Binding SelectedIndexFromPortsList}" SelectionChanged="ListView_SelectionChanged" FontSize="14" MouseEnter="TrayPopup_MouseEnter" MouseLeave="TrayPopup_MouseLeave" ItemTemplate="{StaticResource trayPopupTemplate}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="IsEnabled" Value="{Binding Open}"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                 </ListView>
             </Grid>
         </tb:TaskbarIcon.TrayPopup>
