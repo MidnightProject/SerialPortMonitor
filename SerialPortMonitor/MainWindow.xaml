@@ -111,7 +111,20 @@
 
     <tb:TaskbarIcon x:Name="notifyIcon"
                     ToolTipText="Serial Port Monitor"
-                    PopupActivation="DoubleClick">
+                    PopupActivation="DoubleClick"
+                    MenuActivation="RightClick">
+
+        <tb:TaskbarIcon.ContextMenu>
+            <ContextMenu FontSize="14">
+                <Separator />
+                <MenuItem Header="Close"
+                          Command="{Binding Data.CloseCommand, Source={StaticResource bindingProxy}}">
+                    <MenuItem.Icon>
+                        <Image Source="\Images\power_black.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+        </tb:TaskbarIcon.ContextMenu>
 
         <tb:TaskbarIcon.TrayPopup>
             <Grid x:Name="trayPopupGrid" Height="Auto" Visibility="{Binding Ports, Converter={StaticResource listToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">

@@ -417,5 +417,33 @@ namespace SerialPortMonitor
             await UpdateApplicationAsync();
         }
         #endregion
+
+        #region CloseCommand
+        private ICommand closeCommand;
+        public ICommand CloseCommand
+        {
+            get
+            {
+                if (closeCommand == null)
+                {
+                    closeCommand = new RelayCommand(
+                        param => this.CloseAsync(),
+                        param => this.CanClose()
+                    );
+                }
+                return closeCommand;
+            }
+        }
+
+        private bool CanClose()
+        {
+            return true;
+        }
+
+        private void CloseAsync()
+        {
+            Application.Current.Shutdown();
+        }
+        #endregion
     }
 }

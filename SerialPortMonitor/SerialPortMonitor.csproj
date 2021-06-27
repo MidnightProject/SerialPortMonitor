@@ -128,6 +128,7 @@
     <Content Include="Helpers\handle.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Images\power_black.png" />
     <Resource Include="Images\sub_blue_rotate_cw.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
