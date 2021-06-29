@@ -442,7 +442,8 @@ namespace SerialPortMonitor
 
         private void CloseAsync()
         {
-            Application.Current.Shutdown();
+            //Application.Current.Shutdown();
+            this.Close();
         }
         #endregion
     }
