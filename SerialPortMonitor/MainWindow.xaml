@@ -116,6 +116,23 @@
 
         <tb:TaskbarIcon.ContextMenu>
             <ContextMenu FontSize="14">
+                <MenuItem Header="Help">
+                    <MenuItem.Icon>
+                        <Image Source="\Images\help_blue.png"/>
+                    </MenuItem.Icon>
+
+                    <MenuItem Header="About author"
+                              Command="{Binding Data.AboutAuthorCommand, Source={StaticResource bindingProxy}}">
+                        <MenuItem.Icon>
+                            <Image Source="\Images\info_blue.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="About Serial Port Monitor">
+                        <MenuItem.Icon>
+                            <Image Source="\Images\monitor.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
                 <Separator />
                 <MenuItem Header="Close"
                           Command="{Binding Data.CloseCommand, Source={StaticResource bindingProxy}}">

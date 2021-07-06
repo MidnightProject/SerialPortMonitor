@@ -1,0 +1,74 @@
+﻿<Window x:Class="SerialPortMonitor.AboutAuthorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i  = "http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei = "http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:local="clr-namespace:SerialPortMonitor"
+        mc:Ignorable="d"
+        Title="About Author" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Icon="\Images\info_blue.ico">
+  
+    <Window.Resources>
+        <Style x:Key="ActionLabelStyle" TargetType="{x:Type Label}">
+            <Setter Property="Foreground" Value="Blue" />
+            <Style.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="TextDecorations" Value="Underline"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid Margin="15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Image Source="\Images\info_blue.png" Width="32" Height="32" Grid.RowSpan="2" Margin="20,0" />
+
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label Content="Author:" Grid.Column="0" Grid.Row="0"/>
+                <Label Content="MidnightProject" Grid.Column="1" Grid.Row="0"/>
+                <Label Content="Contact:" Grid.Column="0" Grid.Row="1"/>
+                <Label Grid.Column="1" Grid.Row="1" Style="{StaticResource ActionLabelStyle}" >
+                    <TextBlock>krawczyksebastian84@gmail.com</TextBlock>
+                    
+                    <Label.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Copy" Click="CopyEmail_Click">
+                                <MenuItem.Icon>
+                                    <Image Source="\Images\copy.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Label.ContextMenu>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                            <ei:LaunchUriOrFileAction Path="mailto:krawczyksebastian84@gmail.com" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Label>
+            </Grid>
+
+            <Button IsDefault="True" Name="btnDialogOk" Click="btnDialogOk_Click" MinWidth="60" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,15,0,0">_Ok</Button>
+        </Grid>
+    </Grid>
+</Window>

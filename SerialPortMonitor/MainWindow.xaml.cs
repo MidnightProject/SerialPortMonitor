@@ -22,6 +22,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Input;
 using static SerialPortMonitor.Helpers.Command;
+using System.Net.Mail;
+using System.Net.Mime;
+using System.Collections;
+using System.Net;
 
 namespace SerialPortMonitor
 {
@@ -442,9 +446,41 @@ namespace SerialPortMonitor
 
         private void CloseAsync()
         {
-            //Application.Current.Shutdown();
             this.Close();
         }
         #endregion
+
+        #region AboutAuthorCommand
+        private ICommand aboutAuthorCommand;
+        public ICommand AboutAuthorCommand
+        {
+            get
+            {
+                if (aboutAuthorCommand == null)
+                {
+                    aboutAuthorCommand = new RelayCommand(
+                        param => this.AboutAuthorAsync(),
+                        param => this.CanAboutAuthor()
+                    );
+                }
+                return aboutAuthorCommand;
+            }
+        }
+
+        private bool CanAboutAuthor()
+        {
+            return true;
+        }
+
+        private void AboutAuthorAsync()
+        {
+            AboutAuthorWindow aboutAuthorDialog = new AboutAuthorWindow();
+            aboutAuthorDialog.ShowDialog();
+        }
+        #endregion
+
+        
+
+        
     }
 }
