@@ -31,10 +31,10 @@
                     <Image MaxHeight="20" Margin="0,0,2,0" ToolTip="{Binding Open, Converter={StaticResource openToToolTipConverter}}">
                         <Image.Style>
                             <Style TargetType="{x:Type Image}">
-                                <Setter Property="Source" Value="\Images\block_black.png"/>
+                                <Setter Property="Source" Value="/Images/block_black.png"/>
                                 <Style.Triggers>
                                     <DataTrigger Value="True" Binding="{Binding Open}">
-                                        <Setter Property="Source" Value="\Images\button_blue_play.png"/>
+                                        <Setter Property="Source" Value="/Images/button_blue_play.png"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -78,7 +78,7 @@
                             <ContextMenu>
                                 <MenuItem Header="Refresh" Command="{Binding Data.RefreshCommand, Source={StaticResource bindingProxy}}">
                                     <MenuItem.Icon>
-                                        <Image Source="\Images\sub_blue_rotate_cw.png" Margin="0,0,2,2"/>
+                                        <Image Source="/Images/sub_blue_rotate_cw.png" Margin="0,0,2,2"/>
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </ContextMenu>
@@ -90,7 +90,7 @@
                                     <Setter Property="Source" Value="{Binding ApplicationIcon}"/>
                                     <Style.Triggers>
                                         <DataTrigger Value="File Not Found" Binding="{Binding ApplicationName}">
-                                            <Setter Property="Source" Value="\Images\block_black.png"/>
+                                            <Setter Property="Source" Value="/Images/block_black.png"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -118,18 +118,18 @@
             <ContextMenu FontSize="14">
                 <MenuItem Header="Help">
                     <MenuItem.Icon>
-                        <Image Source="\Images\help_blue.png"/>
+                        <Image Source="/Images/help_blue.png"/>
                     </MenuItem.Icon>
 
                     <MenuItem Header="About author"
                               Command="{Binding Data.AboutAuthorCommand, Source={StaticResource bindingProxy}}">
                         <MenuItem.Icon>
-                            <Image Source="\Images\info_blue.png"/>
+                            <Image Source="/Images/info_blue.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Header="About Serial Port Monitor">
                         <MenuItem.Icon>
-                            <Image Source="\Images\monitor.png"/>
+                            <Image Source="/Images/monitor.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
                 </MenuItem>
@@ -137,7 +137,7 @@
                 <MenuItem Header="Close"
                           Command="{Binding Data.CloseCommand, Source={StaticResource bindingProxy}}">
                     <MenuItem.Icon>
-                        <Image Source="\Images\power_black.png"/>
+                        <Image Source="/Images/power_black.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </ContextMenu>
